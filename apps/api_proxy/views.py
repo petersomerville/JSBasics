@@ -20,3 +20,5 @@ def data(request):
             return JsonResponse({'error': 'Request failed'})
 
     return JsonResponse({'error': 'GET request not allowed'})
+
+    
