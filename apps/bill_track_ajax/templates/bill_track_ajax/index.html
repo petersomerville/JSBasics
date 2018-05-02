@@ -1,0 +1,201 @@
+{% extends 'bill_track_ajax/base.html' %} {% block body %}
+
+
+<div class="container mt-3">
+    <h1>Bill Track Ajax</h1>
+    <form action="{% url 'api_proxy:data' %}" method="POST">
+        <div class="form-row">
+            <input type="text" class="form-control col-8" name="api-url" value="http://data.coding.kitchen/api/person/1">
+            <button class="btn btn-primary ml-2">Get</button>
+            <i class="fa fa-spinner fa-spin call"></i>
+            {% csrf_token %}
+        </div>
+    </form>
+
+    <div class="results mt-3">
+        <div class="scroller"></div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<script>
+
+    $(document).ready(function () {
+        
+        /////////// CODING KITCHEN API
+        
+        let findCapitals = function (response) {
+            console.log(response);
+            for (let index in response) {
+                let city = response[index];
+
+                let cityDiv = createElement("div");
+                cityDiv.text(city.name)
+                $(".scroller").append(cityDiv)
+
+                let cityLink = createElement("a");
+                cityLink.text(" [Link]")
+                cityLink.attr("href", city.api)
+                cityDiv.append(cityLink)
+
+                if (city.is_capital) {
+                    cityDiv.addClass("include");
+                }
+                else {
+                    cityDiv.addClass("exclude");
+                }
+            }
+        }
+        
+        let findProfitableCompanies = function (response) {
+            console.log(response);
+            for (let index in response) {
+                let company = response[index];
+
+                let companyDiv = createElement("div");
+                companyDiv.text(company.name)
+
+                let coNetInc = createElement("span");
+                coNetInc.text(" " + company.net_income)
+                companyDiv.append(coNetInc)
+
+                if (company.net_income > 0) {
+                    companyDiv.addClass("include");
+                }
+                $(".scroller").append(companyDiv)
+            }
+        }
+
+        let findCompany = function (response) {
+            console.log(response);
+            let company = response;
+
+            let companyName = createElement("div");
+            companyName.text(company.name)
+
+            let companyStats = createElement("div");
+            let companyInd = createElement("span");
+            companyInd.text("  Industry: " + company.industry)
+            companyStats.append(companyInd)
+
+            let companySym = createElement("span");
+            companySym.text(", Symbol: " + company.symbol + ", ")
+            companyStats.append(companySym)
+
+            let companyLink = createElement("a");
+            companyLink.text("[Link]")
+            companyLink.attr("href", company.api)
+            companyStats.append(companyLink)
+
+            let companySpacer = createElement("hr");
+
+            $(".scroller").append(companyName)
+            $(".scroller").append(companyStats)
+            $(".scroller").append(companySpacer)
+        }
+
+        let findPeople = function (response) {
+            console.log(response);
+            for (let index in response) {
+                let person = response[index];
+
+                let personDiv = createElement("div");
+                personDiv.text(person.first + " " + person.last)
+
+                if (person.gender == "M") {
+                    personDiv.addClass("male");
+                }
+                else {
+                    personDiv.addClass("female");
+                }
+                $(".scroller").append(personDiv)
+            }
+        }
+
+        let findState = function (response) {
+            console.log(response);
+            let state = response;
+
+            let stateDiv = createElement("div");
+            stateDiv.text(state.name + " // abbreviation: ")
+
+            let stateAbrev = createElement("span");
+            stateAbrev.text(state.abbreviation + " // ")
+            stateDiv.append(stateAbrev)
+            
+            let stateCityCount = createElement("span");
+            stateCityCount.text("has " + state.cities.length + " cities")
+            stateDiv.append(stateCityCount)
+
+            $(".scroller").append(stateDiv)
+        }
+
+        let findPerson = function (response) {
+            console.log(response);
+            let person = response;
+
+            let personDiv = createElement("div");
+            personDiv.addClass("personbox");
+
+            let personName = createElement("div");
+            personName.text(person.first + " " + person.last + " " + person.id)
+            personName.click(function(event){
+                $(this).next().slideToggle(1000)
+            })
+            personName.attr("contenteditable", true)
+            personName.keypress(function(event){
+                if (event.keyCode == 13) {
+                    event.preventDefault()
+                    $(this).blur()
+                }
+            })
+            personDiv.append(personName)
+
+            let personInfo = createElement("div");
+            personDiv.append(personInfo)
+
+            let personGender = createElement("div");
+            personGender.text("Gender: " + person.gender)
+            personInfo.append(personGender)
+
+            let divider = createElement("hr");
+            divider.addClass("dottedline");
+            personInfo.append(divider)
+
+            let personAddress = createElement("div");
+            personAddress.text("Current Address: ")
+            for (let key in person.current_address) {
+                let curadr = person.current_address[key];
+                let currentAdd = createElement("div");
+                currentAdd.text(key + ": " + person.current_address[key])
+                personAddress.append(currentAdd)
+            }
+            personInfo.append(personAddress)
+
+            let divider2 = createElement("hr");
+            divider2.addClass("dottedline");
+            personInfo.append(divider2)
+
+            let formerAddress = createElement("div");
+            formerAddress.text("Former Addresses: ")
+            for (let index in person.past_addresses) {
+                let foradr = person.past_addresses[index];
+                let pastAddress = createElement("div");
+                pastAddress.text(foradr.street + ", " + foradr.city + ", " + foradr.state + " " + foradr.zip)
+                pastAddress.appendTo(formerAddress)
+            }
+            personInfo.append(formerAddress)
+
+            $(".scroller").append(personDiv)
+
+        }
+
+        
+        /////////// CODING KITCHEN API
+
+
+        makeApiCall(findPerson);
+    });
+
+</script> {% endblock %}
