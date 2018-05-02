@@ -1,0 +1,43 @@
+.fa {
+    font-size: 2.2em;
+    margin-left: 10px;
+}
+
+.results {
+    overflow: scroll;
+    height: calc(100vh - 130px);
+    border: 1px solid #eee;
+}
+
+.call {
+    display: none;
+}
+
+.include {
+    color: green;
+    font-size: 2em;
+}
+
+.exclude {
+    color: gray;
+    font-size: 0.5em;
+}
+
+.male {
+    color: blue;
+}
+
+.female {
+    color: pink;
+}
+
+.personbox {
+    background-color: palegreen;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid black;
+}
+
+.copy-me {
+    display: none;
+}

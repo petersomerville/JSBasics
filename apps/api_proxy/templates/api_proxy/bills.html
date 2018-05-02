@@ -1,0 +1,76 @@
+{% extends 'api_proxy/base.html' %} {% block body %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">jsQuery BillTracker</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">Dropdown</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <form action="#" method="POST">
+        <div class="form-group row p-3">
+            <input type="text" class="col-6 mr-2" id="html_description" name="html_description" placeholder="Description">
+            <input type="text" class="col-2 mr-2" id="html_amount" name="html_amount" placeholder="Amount">
+            <button class="btn btn-primary">Add</button>
+
+        </div>
+    </form>
+    <hr>
+    <div class="row copy-me mb-2">
+        <div class="col-6 add-desc" contenteditable="true">bill.description</div>
+        <div class="col-2 add-amt" contenteditable="true">bill.amount</div>
+        <div class="col-4">
+            <a class="btn btn-danger btn-del">Delete</a>
+        </div>
+    </div>
+    <div class="allbills"></div>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<script>
+    $(document).ready(function () {
+        $("button").click(function (event) {
+            event.preventDefault();
+            let desc = $("#html_description").val()
+            let amt = $("#html_amount").val()
+            let bill = $(".copy-me").clone()
+            bill.removeClass("copy-me")
+            bill.find(".add-desc").text(desc)
+            if (Number(amt)) {
+                bill.find(".add-amt").text(amt);
+            }else{ bill.find(".add-amt").text(0);
+            }
+            $(".allbills").append(bill)
+            bill.find(".add-desc, .add-amt").keypress(function (event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    if (Number(bill.find(".add-amt").text())) {
+                        $(this).blur();
+                    }else{
+                        bill.find(".add-amt").text(0)
+                        $(this).blur();
+                    }
+                }
+            });
+            bill.find(".btn-del").click(function (event){
+                bill.remove();
+            });
+        });
+    });
+</script> {% endblock %}
