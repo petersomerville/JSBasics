@@ -39,11 +39,65 @@
 <script>
     $(document).ready(function () {
         console.log("DOCUMENT IS READY!");
+        $.ajax({
+            type: "GET",
+            url: "{% url 'bill_track_ajax:get_bills' %}",
+            data: { "key": "value" },
+            success: function (response) {
+                for (let index in response) {
+                    let item = response[index]
+                    let desc = item["description"]
+                    let amt = item["amount"]
+                    let delete_url = item["delete_url"]
+                    let update_url = item["update_url"]
+                    let bill = $(".copy-me").clone()
+                    bill.removeClass("copy-me")
+                    bill.find(".add-desc").text(desc)
+                    bill.find(".add-amt").text(amt)
+                    $(".allbills").append(bill)
+                    bill.find(".btn-del").click(function (event) {
+                        $.ajax({
+                            beforeSend: setCsrfToken,
+                            type: "POST",
+                            url: delete_url,
+                            data: {
+                                "key": "value"
+                            },
+                            success: function (response) {
+                                bill.remove()
+                            }
+                        });
+                    });
+                    bill.find(".add-desc, .add-amt").keypress(function (event) {
+                        if (event.keyCode === 13) {
+                            event.preventDefault();
+                            if ($(".add-desc")) {
+                                $(this).blur();
+                            } else if ($(".add-amt")) {
+                                $(this).blur();
+                            }
+                            $.ajax({
+                                beforeSend: setCsrfToken,
+                                type: "POST",
+                                url: update_url,
+                                data: {
+                                    "html_description": $(this).parent().find(".add-desc").text(),
+                                    "html_amount": $(this).parent().find(".add-amt").text(),
+                                },
+                                success: function (response) {
+                                    console.log(response)
+                                    }
+                            })
+                        }
+                    })
+                }
+            }
+        })
 
         $("button").click(function (event) {
             event.preventDefault()
             $.ajax({
-                beforeSend:setCsrfToken,
+                beforeSend: setCsrfToken,
                 type: "POST",
                 url: $("form").attr("action"),
                 data: {
@@ -61,15 +115,17 @@
                     bill.find(".add-desc").text(desc)
                     if (Number(amt)) {
                         bill.find(".add-amt").text(amt);
-                    }else{ bill.find(".add-amt").text(0);
+                    } else {
+                        bill.find(".add-amt").text(0);
                     }
                     $(".allbills").append(bill)
                     bill.find(".btn-del").click(function (event) {
                         $.ajax({
-                            beforeSend:setCsrfToken,
+                            beforeSend: setCsrfToken,
                             type: "POST",
                             url: delete_url,
-                            data: {"key": "value"
+                            data: {
+                                "key": "value"
                             },
                             success: function (response) {
                                 bill.remove()
@@ -79,52 +135,30 @@
                     bill.find(".add-desc, .add-amt").keypress(function (event) {
                         if (event.keyCode === 13) {
                             event.preventDefault();
-                            console.log("blah")
-                            console.log($(this).text())
-                            // $.ajax({
-                            //     beforeSend:setCsrfToken,
-                            //     type: "POST",
-                            //     url: update_url,
-                            //     data: {
-                            //         "html_description": $("input[name=html_description]").val(),
-                            //         "html_amount": $("input[name=html_amount]").val(),
-                            //     },
-                            //     success: function (response) {
-                            //         console.log(response)
-                            //     }
-                            // })
+                            if ($(".add-desc")) {
+                                $(this).blur();
+                            } else if ($(".add-amt")) {
+                                $(this).blur();
+                            }
+                            $.ajax({
+                                beforeSend: setCsrfToken,
+                                type: "POST",
+                                url: update_url,
+                                data: {
+                                    "html_description": $(this).parent().find(".add-desc").text(),
+                                    "html_amount": $(this).parent().find(".add-amt").text(),
+                                },
+                                success: function (response) {
+                                    console.log(response)
+                                }
+                            })
                         }
                     })
                 },
-                error: function(response) {
+                error: function (response) {
                     console.log(response)
                 }
             });
-            // event.preventDefault();
-            // let desc = $("#html_description").val()
-            // let amt = $("#html_amount").val()
-            // let bill = $(".copy-me").clone()
-            // bill.removeClass("copy-me")
-            // bill.find(".add-desc").text(desc)
-            // if (Number(amt)) {
-            //     bill.find(".add-amt").text(amt);
-            // }else{ bill.find(".add-amt").text(0);
-            // }
-            // $(".allbills").append(bill)
-            // bill.find(".btn-del").click(function (event){
-            //     bill.remove();
-            // });
-            // bill.find(".add-desc, .add-amt").keypress(function (event) {
-            //     if (event.keyCode === 13) {
-            //         event.preventDefault();
-            //         if (Number(bill.find(".add-amt").text())) {
-            //             $(this).blur();
-            //         }else{
-            //             bill.find(".add-amt").text(0)
-            //             $(this).blur();
-            //         }
-            //     }
-            // });
         });
     });
 </script> {% endblock %}

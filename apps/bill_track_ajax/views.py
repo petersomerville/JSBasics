@@ -46,19 +46,26 @@ def delete_bill(request, bill_id):
         return JsonResponse({'deletebill': 'blahblahblah'})
 
 
-def update_bill(request, update_url):
+def update_bill(request, bill_id):
     if request.method == 'POST':
         print(request.POST)
+        bill = BillItem.objects.get(id = bill_id)
+        bill.description = request.POST['html_description']
+        bill.amount = request.POST['html_amount']
+        bill.save()
         return JsonResponse({'updatebill': 'blahblah'})
 
-
-
-# def update_bill(request, bill_id):
-#     if request.method == 'POST':
-#         bill = BillItem.objects.get(id = bill_id)
-#         bill.description = request.POST['html_description']
-#         bill.amount = request.POST['html_amount']
-#         bill.save()
-
-#         return redirect('bill_tracker:index')
-#     return render(request, 'bill_tracker/index.html')
+def get_bills(request):
+    print(request.GET)
+    bills = BillItem.objects.filter(user_id = request.session['user_id'])
+    json_list = []
+    for bill in bills:
+        description = bill.description
+        amount = bill.amount
+        json_list.append({
+            "description": description,
+            "amount": amount,
+            "delete_url": redirect('bill_track_ajax:delete_bill', bill_id=bill.id).url,
+            "update_url": redirect('bill_track_ajax:update_bill', bill_id=bill.id).url
+        })
+    return JsonResponse(json_list, safe=False)
