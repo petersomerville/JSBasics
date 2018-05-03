@@ -53,7 +53,11 @@
                     let bill = $(".copy-me").clone()
                     bill.removeClass("copy-me")
                     bill.find(".add-desc").text(desc)
-                    bill.find(".add-amt").text(amt)
+                    if (Number(amt)) {
+                        bill.find(".add-amt").text(amt);
+                    } else {
+                        bill.find(".add-amt").text(0);
+                    }
                     $(".allbills").append(bill)
                     bill.find(".btn-del").click(function (event) {
                         $.ajax({
@@ -71,10 +75,16 @@
                     bill.find(".add-desc, .add-amt").keypress(function (event) {
                         if (event.keyCode === 13) {
                             event.preventDefault();
-                            if ($(".add-desc")) {
+                            
+                            if ($(this).hasClass("add-desc")) {
                                 $(this).blur();
-                            } else if ($(".add-amt")) {
-                                $(this).blur();
+                            } else if ($(this).hasClass("add-amt")) {
+                                if (Number($(this).text())) {
+                                    $(this).blur();
+                                } else {
+                                    $(this).text(0)
+                                    $(this).blur()
+                                }
                             }
                             $.ajax({
                                 beforeSend: setCsrfToken,
@@ -85,7 +95,6 @@
                                     "html_amount": $(this).parent().find(".add-amt").text(),
                                 },
                                 success: function (response) {
-                                    console.log(response)
                                     }
                             })
                         }
@@ -105,7 +114,6 @@
                     "html_amount": $("input[name=html_amount]").val()
                 },
                 success: function (response) {
-                    console.log(response)
                     let desc = response["description"]
                     let amt = response["amount"]
                     let delete_url = response["delete_url"]
@@ -135,10 +143,15 @@
                     bill.find(".add-desc, .add-amt").keypress(function (event) {
                         if (event.keyCode === 13) {
                             event.preventDefault();
-                            if ($(".add-desc")) {
+                            if ($(this).hasClass("add-desc")) {
                                 $(this).blur();
-                            } else if ($(".add-amt")) {
-                                $(this).blur();
+                            } else if ($(this).hasClass("add-amt")) {
+                                if (Number($(this).text())) {
+                                    $(this).blur();
+                                } else {
+                                    $(this).text(0)
+                                    $(this).blur()
+                                }
                             }
                             $.ajax({
                                 beforeSend: setCsrfToken,
@@ -149,14 +162,12 @@
                                     "html_amount": $(this).parent().find(".add-amt").text(),
                                 },
                                 success: function (response) {
-                                    console.log(response)
                                 }
                             })
                         }
                     })
                 },
                 error: function (response) {
-                    console.log(response)
                 }
             });
         });
