@@ -1,10 +1,12 @@
 from django.db import models
+from apps.login_reg.models import User
 
 
-class User(models.Model):
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=64)
-    password = models.CharField(max_length=256)
+class BillItem(models.Model):
+    description = models.CharField(max_length=128)
+    amount = models.FloatField()
+
+    user = models.ForeignKey(User, related_name = 'bills_of', on_delete=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
